@@ -1,0 +1,142 @@
+package com.aymen.enchere.enchere;
+
+import com.aymen.enchere.file.FileStorageService;
+import com.aymen.enchere.file.FileUtils;
+import com.aymen.enchere.user.User;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+@Slf4j
+@Transactional
+public class EnchereService  {
+
+    private final EnchereRepository enchereRepository;
+    private final FileStorageService fileStorageService;
+
+
+    public Integer save(Enchere request, Authentication connectedUser) {
+        request.setNombreCondidatsRestants(request.getNombreCondidat());
+        request.setNombreCondidatsInscrits(0); //
+        return enchereRepository.save(request).getIdEnchere();
+    }
+    public List<EnchereResponse> getEncheresByType(TypeEnchere type) {
+        List<Enchere> encheres = enchereRepository.findByType(type);
+        return encheres.stream()
+                .map(this::toEnchereResponse)
+                .collect(Collectors.toList());
+    }
+    public List<EnchereResponse> getListEnchere() {
+        List<Enchere> encheres = enchereRepository.findAll();
+        return encheres.stream()
+                .map(this::toEnchereResponse)
+                .collect(Collectors.toList());
+    }
+    public EnchereResponse toEnchereResponse(Enchere enchere) {
+        EnchereResponse response = new EnchereResponse();
+        response.setIdEnchere(enchere.getIdEnchere());
+        response.setNomProduit(enchere.getNomProduit());
+        response.setDescriptionProduit(enchere.getDescriptionProduit());
+        response.setNombreCondidat(enchere.getNombreCondidat());
+        response.setDate(enchere.getDate());
+        response.setHeure(enchere.getHeure());
+        response.setImage(FileUtils.readFileFromLocation(enchere.getImage())); // Lire l'image à partir de l'emplacement
+        response.setPrix(enchere.getPrix());
+        response.setPrixE(enchere.getPrixE());
+
+        response.setPrixGagnant(enchere.getPrixGagnant());
+        response.setNombreCondidatsInscrits(enchere.getNombreCondidatsInscrits());
+        response.setNombreCondidatsRestants(enchere.getNombreCondidatsRestants());
+        response.setType(enchere.getType());
+
+
+        return response;
+    }
+
+    public void uploadEnchereCoverPicture(MultipartFile file, Authentication connectedUser, Integer idEnchere) {
+       // if (connectedUser != null) {
+            Enchere enchere = enchereRepository.findById(idEnchere)
+                    .orElseThrow(() -> new EntityNotFoundException("No enchere found with ID:: " + idEnchere));
+          //  var profilePicture = fileStorageService.saveFile(file, connectedUser.getName());
+          //  var profilePicture = fileStorageService.saveFile(file, String.valueOf(connectedUser));
+              var profilePicture = fileStorageService.saveFile(file);
+
+            enchere.setImage(profilePicture);
+            enchereRepository.save(enchere);
+     /*   } else {
+            // Gérer le cas où connectedUser est null
+            throw new IllegalArgumentException("Connected user is null.");
+        }
+        */
+    }
+
+    public void modifEnchere(Enchere enchere, Integer idEnch) {
+        Enchere enchere1 = enchereRepository.findById(idEnch).orElseThrow(() -> new RuntimeException("Enchere not found"));
+
+        if (enchere.getNomProduit() != null) {
+            enchere1.setNomProduit(enchere.getNomProduit());
+        }
+        if (enchere.getDescriptionProduit() != null) {
+            enchere1.setDescriptionProduit(enchere.getDescriptionProduit());
+        }
+        if (enchere.getNombreCondidat() != null) {
+            enchere1.setNombreCondidat(enchere.getNombreCondidat());
+        }
+        if (enchere.getDate() != null) {
+            enchere1.setDate(enchere.getDate());
+        }
+        if (enchere.getHeure() != null) {
+            enchere1.setHeure(enchere.getHeure());
+        }
+        if (enchere.getImage() != null && !enchere.getImage().isEmpty()) {
+            enchere1.setImage(enchere.getImage());
+        }
+        if (enchere.getPrix() != null) {
+            enchere1.setPrix(enchere.getPrix());
+        }
+
+        enchereRepository.save(enchere1);
+    }
+
+
+
+    public void ajoutEnchereTerminer(Enchere enchere ,Integer idEnch) {
+        Enchere enchere1= enchereRepository.findById(idEnch).get();
+        enchere1.setPrixGagnant(enchere.getPrixGagnant());
+
+        enchereRepository.save(enchere1);
+
+    }
+
+    public void findById(Integer EcnhereID) {
+        enchereRepository.findById(EcnhereID);
+
+    }
+
+    public void supprimerEnchere(Integer EnchereId ,Authentication connectedUser){
+
+        enchereRepository.deleteById(EnchereId);
+    }
+
+    public void updateParticipantsInfo(Integer enchereId) {
+        Enchere enchere = enchereRepository.findById(enchereId).orElse(null);
+        if (enchere != null) {
+            int nombreParticipants = enchere.getParticipantList() != null ? enchere.getParticipantList().size() : 0;
+            enchere.setNombreCondidatsInscrits(nombreParticipants);
+            enchere.setNombreCondidatsRestants(enchere.getNombreCondidat() - nombreParticipants);
+            enchereRepository.save(enchere);
+        }
+    }
+
+}
