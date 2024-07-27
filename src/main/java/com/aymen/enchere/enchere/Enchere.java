@@ -36,10 +36,11 @@ public class Enchere extends BaseEntity {
     Float PrixGagnant ;
     Float PrixE ;
     Integer nombreCondidatsInscrits;
-
     Integer nombreCondidatsRestants;
     @Enumerated(EnumType.STRING)
      TypeEnchere type;
+    @Enumerated(EnumType.STRING)
+    Typeetat etat;
 
   @JsonIgnore
  @OneToMany(mappedBy = "enchere")

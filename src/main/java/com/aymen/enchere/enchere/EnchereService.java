@@ -25,12 +25,23 @@ public class EnchereService  {
     private final EnchereRepository enchereRepository;
     private final FileStorageService fileStorageService;
 
-
+/*
     public Integer save(Enchere request, Authentication connectedUser) {
         request.setNombreCondidatsRestants(request.getNombreCondidat());
         request.setNombreCondidatsInscrits(0); //
         return enchereRepository.save(request).getIdEnchere();
     }
+
+ */
+public Integer save(Enchere request, Authentication connectedUser) {
+    request.setNombreCondidatsRestants(request.getNombreCondidat());
+    request.setNombreCondidatsInscrits(0);
+        request.setEtat(Typeetat.Encours);
+
+
+    return enchereRepository.save(request).getIdEnchere();
+}
+
     public List<EnchereResponse> getEncheresByType(TypeEnchere type) {
         List<Enchere> encheres = enchereRepository.findByType(type);
         return encheres.stream()
@@ -54,11 +65,12 @@ public class EnchereService  {
         response.setImage(FileUtils.readFileFromLocation(enchere.getImage())); // Lire l'image à partir de l'emplacement
         response.setPrix(enchere.getPrix());
         response.setPrixE(enchere.getPrixE());
-
         response.setPrixGagnant(enchere.getPrixGagnant());
         response.setNombreCondidatsInscrits(enchere.getNombreCondidatsInscrits());
         response.setNombreCondidatsRestants(enchere.getNombreCondidatsRestants());
         response.setType(enchere.getType());
+        response.setEtat(enchere.getEtat());
+
 
 
         return response;
@@ -114,7 +126,7 @@ public class EnchereService  {
     public void ajoutEnchereTerminer(Enchere enchere ,Integer idEnch) {
         Enchere enchere1= enchereRepository.findById(idEnch).get();
         enchere1.setPrixGagnant(enchere.getPrixGagnant());
-
+        enchere1.setEtat(Typeetat.Terminer);
         enchereRepository.save(enchere1);
 
     }

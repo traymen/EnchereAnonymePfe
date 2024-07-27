@@ -66,6 +66,34 @@ public class BeansConfig {
         config.setAllowCredentials(true);
         config.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
         config.setAllowedHeaders(Arrays.asList(
+                "*", // Permet tous les en-têtes. Vous pouvez remplacer par une liste spécifique si nécessaire
+                HttpHeaders.AUTHORIZATION,
+                HttpHeaders.ORIGIN,
+                HttpHeaders.CONTENT_TYPE,
+                HttpHeaders.ACCEPT
+        ));
+        config.setAllowedMethods(Arrays.asList(
+                "DELETE",
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "OPTIONS"
+        ));
+
+        source.registerCorsConfiguration("/**", config);
+        return new CorsFilter(source);
+    }
+    /*
+    @Bean
+    @Order(Ordered.HIGHEST_PRECEDENCE)
+    public CorsFilter corsFilter() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowCredentials(true);
+        config.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+        config.setAllowedHeaders(Arrays.asList(
                 HttpHeaders.AUTHORIZATION,
                 HttpHeaders.ORIGIN,
                 HttpHeaders.CONTENT_TYPE,
@@ -84,6 +112,8 @@ public class BeansConfig {
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
+
+     */
 /*
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)

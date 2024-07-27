@@ -24,6 +24,7 @@ public class EnchereResponse {
     private Integer nombreCondidatsRestants;
     private TypeEnchere type;
     private Float PrixE ;
+    private Typeetat etat;
 
 
 

@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Tag(name = "Favoris")
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "http://localhost:4200") // Configurer CORS pour ce contrôleur spécifique
 public class ControllerFavoris {
     @Autowired
     private ServiceFavoris service;
