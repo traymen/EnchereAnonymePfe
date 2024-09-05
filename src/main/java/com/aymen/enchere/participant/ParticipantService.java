@@ -53,6 +53,21 @@ public class ParticipantService {
         updateParticipantsInfo(idEnchere);
 
     }
+    public void saveParticipationVip(String codeAcces, Authentication connectedUser , Participant participant ) {
+        Optional<Enchere> enchereOptional = enchereRepository.findByCodeAcces(codeAcces);
+
+        if (enchereOptional.isPresent()) {
+            Enchere enchere = enchereOptional.get();
+            participant.setEnchere(enchere);
+            participantRepository.save(participant);
+            updateParticipantsInfo(enchere.getIdEnchere()); // Assurez-vous que l'ID est correct
+        } else {
+            // Gérer le cas où l'enchère n'est pas trouvée
+            throw new IllegalArgumentException("Enchère introuvable avec le code d'accès : " + codeAcces);
+        }
+    }
+
+
     private void updateParticipantsInfo(Integer enchereId) {
         Enchere enchere = enchereRepository.findById(enchereId)
                 .orElseThrow(() -> new EntityNotFoundException("Aucune enchère trouvée avec l'ID : " + enchereId));
@@ -100,6 +115,7 @@ public List<Participant> listParticipantByEnchere(Integer idEnch) {
                     dto.setNomProduit(participant.getEnchere().getNomProduit());
                     dto.setImage(FileUtils.readFileFromLocation(participant.getEnchere().getImage()));
                     dto.setPrix(participant.getPrix());
+                    dto.setCodeAcces(participant.getEnchere().getCodeAcces());
 
 
                     return dto;
@@ -162,6 +178,9 @@ public List<Participant> listParticipantByEnchere(Integer idEnch) {
 
  */
 
+    public List<ParticipantCountDTO> getParticipantCounts() {
+        return participantRepository.countParticipationByUser();
+    }
 }
 
 

@@ -17,11 +17,18 @@ public class ReclamationService {
 
     @Autowired
     private ReclamationRepository reclamationRepository;
-
+/*
     public Reclamation createReclamation(Reclamation reclamation) {
         reclamation.setReponse("en cours de traitement");
         return reclamationRepository.save(reclamation);
     }
+*/
+public Reclamation createReclamation(Reclamation reclamation) {
+    if (reclamation.getReponse() == null || reclamation.getReponse().isEmpty()) {
+        reclamation.setEtat(EtatReclamation.EN_COURS);  // Définit l'état à "En cours de traitement" si la réponse est nulle ou vide
+    }
+    return reclamationRepository.save(reclamation);
+}
 
 
     public void deleteReclamation(Integer id) {
@@ -49,6 +56,8 @@ public class ReclamationService {
         response.setContenu(reclamation.getContenu());
         response.setFirstname(reclamation.getFirstname());
         response.setLastname(reclamation.getLastname());
+        response.setEtat(reclamation.getEtat());
+
 
 
 
@@ -71,9 +80,11 @@ public class ReclamationService {
         response.setLastname(reclamation.getLastname());
         response.setGmail(reclamation.getGmail());
         response.setReponse(reclamation.getReponse());
+        response.setEtat(reclamation.getEtat());
+
         return response;
     }
-
+/*
     public void repondrereclamation(Reclamation reclamation , Integer idReclamation) {
         Reclamation reclamation1= reclamationRepository.findById(idReclamation).get();
         reclamation1.setReponse(reclamation.getReponse());
@@ -81,4 +92,22 @@ public class ReclamationService {
         reclamationRepository.save(reclamation1);
 
     }
+
+ */
+public void repondrereclamation(Reclamation reclamation, Integer idReclamation) {
+    // Récupérer la réclamation existante par son ID
+    Reclamation reclamation1 = reclamationRepository.findById(idReclamation).orElseThrow(() -> new RuntimeException("Réclamation non trouvée"));
+
+    // Mettre à jour la réponse de la réclamation
+    reclamation1.setReponse(reclamation.getReponse());
+
+    // Vérifier si la réponse n'est pas nulle ou vide, et mettre à jour l'état en conséquence
+    if (reclamation.getReponse() != null && !reclamation.getReponse().isEmpty()) {
+        reclamation1.setEtat(EtatReclamation.TRAITE);  // Mettre à jour l'état à "TRAITE"
+    }
+
+    // Sauvegarder les modifications
+    reclamationRepository.save(reclamation1);
+}
+
 }

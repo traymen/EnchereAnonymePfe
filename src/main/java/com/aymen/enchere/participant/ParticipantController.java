@@ -29,6 +29,13 @@ public class ParticipantController {
     {
         service.saveparticipation(idEnchere, connectedUser,participant);
     }
+    @PostMapping("/AjouterParticipationVip")
+    public void saveParticipationVip(
+            @RequestParam String codeAcces, Authentication connectedUser, @RequestBody Participant participant
+    )
+    {
+        service.saveParticipationVip(codeAcces, connectedUser,participant);
+    }
 
     @GetMapping("/ListeParticipationByIdEnchere")
 
@@ -48,4 +55,8 @@ public class ParticipantController {
         return ResponseEntity.ok(participationsWithUserDetails);
     }
 */
+@GetMapping("/counts")
+public List<ParticipantCountDTO> getParticipantCounts() {
+    return service.getParticipantCounts();
+}
 }

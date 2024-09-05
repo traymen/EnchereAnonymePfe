@@ -26,8 +26,18 @@ public class Reclamation   extends BaseEntity {
     String firstname;
     String lastname;
     String gmail;
-    String reponse = "en cours de traitement";
-
+   // String reponse = "en cours de traitement";
+   String reponse ;
+    @Enumerated(EnumType.STRING)  // Cette annotation permet de stocker la valeur textuelle
+    EtatReclamation etat;  // Nouveau champ pour l'état de traitement
+    public String getEtatDescription() {
+        if (etat == EtatReclamation.EN_COURS) {
+            return "En cours de traitement";
+        } else if (etat == EtatReclamation.TRAITE) {
+            return "Traité";
+        }
+        return "";
+    }
 }
 
 

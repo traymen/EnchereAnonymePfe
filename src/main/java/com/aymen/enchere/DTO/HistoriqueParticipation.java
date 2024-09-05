@@ -19,6 +19,7 @@ public class HistoriqueParticipation {
     byte[]  image ;
     Float PrixBoutique ;
     Float prix ;
+    String codeAcces;
 
 
 }

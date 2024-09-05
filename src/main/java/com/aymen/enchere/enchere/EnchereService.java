@@ -2,6 +2,7 @@ package com.aymen.enchere.enchere;
 
 import com.aymen.enchere.file.FileStorageService;
 import com.aymen.enchere.file.FileUtils;
+import com.aymen.enchere.notification.ServiceNotification;
 import com.aymen.enchere.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,24 +26,61 @@ public class EnchereService  {
 
     private final EnchereRepository enchereRepository;
     private final FileStorageService fileStorageService;
-
-/*
-    public Integer save(Enchere request, Authentication connectedUser) {
-        request.setNombreCondidatsRestants(request.getNombreCondidat());
-        request.setNombreCondidatsInscrits(0); //
-        return enchereRepository.save(request).getIdEnchere();
-    }
-
- */
+    private final ServiceNotification notificationService;
+    /*
 public Integer save(Enchere request, Authentication connectedUser) {
     request.setNombreCondidatsRestants(request.getNombreCondidat());
     request.setNombreCondidatsInscrits(0);
         request.setEtat(Typeetat.Encours);
+    String description = "Une nouvelle enchère '" + request.getNomProduit() ;
+    String imageUrl =request.getImage();
+    notificationService.createNotification(
+            "Nouvelle enchère ajoutée",
+            description,
+            imageUrl
 
+    );
 
     return enchereRepository.save(request).getIdEnchere();
 }
+*/
+    public Integer save(Enchere request, Authentication connectedUser) {
+        request.setNombreCondidatsRestants(request.getNombreCondidat());
+        request.setNombreCondidatsInscrits(0);
+        request.setEtat(Typeetat.Encours);
 
+        // Vérifier si l'enchère est privée
+        if (request.isEncherePrivee()) {
+            request.setCodeAcces(genererCodeAcces());  // Générer et stocker le code d'accès
+        } else {
+            request.setCodeAcces(null);  // Si l'enchère n'est pas privée, le code d'accès est nul
+        }
+        enchereRepository.save(request);
+        // Création de la notification
+        String description = "Une nouvelle enchère '" + request.getNomProduit() + "'";
+        Integer auctionId =  request.getIdEnchere() ;
+
+        //String imageUrl = request.getImage();
+        notificationService.createNotification(
+                "Nouvelle enchère ajoutée",
+                description,
+                auctionId
+        );
+
+        // Sauvegarde de l'enchère et retour de l'ID
+      //  return enchereRepository.save(request).getIdEnchere();
+        return auctionId ;
+    }
+
+    // Méthode privée pour générer un code d'accès à 4 chiffres
+    private String genererCodeAcces() {
+        int code = (int) (Math.random() * 9000) + 1000; // Génère un nombre entre 1000 et 9999
+        return String.valueOf(code);
+    }
+
+    public Optional<Enchere> getEnchereByCodeAcces(String codeAcces) {
+        return enchereRepository.findByCodeAcces(codeAcces);
+    }
     public List<EnchereResponse> getEncheresByType(TypeEnchere type) {
         List<Enchere> encheres = enchereRepository.findByType(type);
         return encheres.stream()
@@ -70,6 +109,7 @@ public Integer save(Enchere request, Authentication connectedUser) {
         response.setNombreCondidatsRestants(enchere.getNombreCondidatsRestants());
         response.setType(enchere.getType());
         response.setEtat(enchere.getEtat());
+        response.setCodeAcces(enchere.getCodeAcces());
 
 
 
@@ -131,10 +171,13 @@ public Integer save(Enchere request, Authentication connectedUser) {
 
     }
 
-    public void findById(Integer EcnhereID) {
-        enchereRepository.findById(EcnhereID);
-
+    public List<EnchereResponse> getListEnchereByid(Integer EcnhereID) {
+        Optional<Enchere> encheres = enchereRepository.findById(EcnhereID);
+        return encheres.stream()
+                .map(this::toEnchereResponse)
+                .collect(Collectors.toList());
     }
+
 
     public void supprimerEnchere(Integer EnchereId ,Authentication connectedUser){
 

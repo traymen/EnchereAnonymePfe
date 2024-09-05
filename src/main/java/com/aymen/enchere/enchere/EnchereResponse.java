@@ -25,6 +25,9 @@ public class EnchereResponse {
     private TypeEnchere type;
     private Float PrixE ;
     private Typeetat etat;
+  //  private boolean encherePrivee;
+    private     String codeAcces;
+
 
 
 

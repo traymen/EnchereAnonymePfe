@@ -41,6 +41,9 @@ public class Enchere extends BaseEntity {
      TypeEnchere type;
     @Enumerated(EnumType.STRING)
     Typeetat etat;
+     boolean encherePrivee;
+
+     String codeAcces;
 
   @JsonIgnore
  @OneToMany(mappedBy = "enchere")
@@ -48,4 +51,8 @@ public class Enchere extends BaseEntity {
 
     @OneToMany(mappedBy = "favoris")
     List<Favoris> favorisList;
+
+ public boolean isEncherePrivee() {
+  return encherePrivee;
+ }
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @RequestMapping("/enchere")
 @RestController
@@ -34,13 +35,14 @@ public class EnchereController {
         List<EnchereResponse> encheres = service.getListEnchere();
         return ResponseEntity.ok(encheres);
     }
+    /*
     @GetMapping("/AfficherListEnchereByType")
     @ResponseBody
     public ResponseEntity<List<EnchereResponse>> getListEnchereType(TypeEnchere type) {
         List<EnchereResponse> encheres = service.getEncheresByType(type);
         return ResponseEntity.ok(encheres);
     }
-
+*/
     @PostMapping(value = "/cover/{enchere-id}", consumes = "multipart/form-data")
     public ResponseEntity<?> uploadEnchereCoverPicture(
             @PathVariable("enchere-id") Integer idEnchere,
@@ -61,9 +63,19 @@ public class EnchereController {
     void ajooutEcnhereTerminer(@RequestBody  Enchere enchere , @RequestParam Integer idEnch){
         service.ajoutEnchereTerminer(enchere, idEnch);
     }
+    @GetMapping("/AfficherListEnchereByType")
+    @ResponseBody
+    public ResponseEntity<List<EnchereResponse>> getListEnchereType(TypeEnchere type) {
+        List<EnchereResponse> encheres = service.getEncheresByType(type);
+        return ResponseEntity.ok(encheres);
+    }
     @GetMapping ("/EnchereById")
-    void getEnchById( @RequestParam Integer idEnch){
-        service.findById(idEnch);
+    @ResponseBody
+
+    public ResponseEntity<List<EnchereResponse>>  getEnchById( @RequestParam Integer idEnch){
+        List<EnchereResponse> encheres =  service.getListEnchereByid(idEnch);
+        return ResponseEntity.ok(encheres);
+
     }
 
     @CrossOrigin(origins = "http://localhost:4200")
@@ -73,6 +85,10 @@ public class EnchereController {
         service.supprimerEnchere(EnchereId,
                 connectedUser);
     }
-
+    @GetMapping("/getEnchereByCodeAcces")
+    public ResponseEntity<Enchere> getEnchereByCodeAcces(@RequestParam String codeAcces) {
+        Optional<Enchere> enchere = service.getEnchereByCodeAcces(codeAcces);
+        return enchere.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
 
 }

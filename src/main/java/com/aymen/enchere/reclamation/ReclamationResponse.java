@@ -17,4 +17,5 @@ public class ReclamationResponse {
     private  String lastname;
     private  String gmail;
     private  String reponse;
+    private EtatReclamation etat;
 }
