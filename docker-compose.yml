@@ -1,9 +1,11 @@
 services:
 
   mysql:
-    container_name: mysql-enchere2
     image: mysql:8.0
+    container_name: mysql-enchere2
+
     environment:
+      MYSQL_ROOT_PASSWORD: my-secret-pw
       MYSQL_DATABASE: EnchereAnonyme
       MYSQL_USER: root
       MYSQL_PASSWORD: my-secret-pw
@@ -37,6 +39,28 @@ services:
     command:
       - "start-dev"
 
+  angular-app:
+    image: angular-enchere1
+    container_name: angular
+    ports:
+      - "4200:80"
+    networks:
+      - spring-demo
+
+  springboot-app:
+    image: enchere-app7
+    container_name: spring7
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3307/EnchereAnonyme
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: my-secret-pw
+    ports:
+      - "8089:8089"
+    networks:
+      - spring-demo
+    depends_on:
+      - mysql
+      -
 networks:
   spring-demo:
     driver: bridge
