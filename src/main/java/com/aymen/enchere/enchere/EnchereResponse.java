@@ -27,6 +27,8 @@ public class EnchereResponse {
     private Typeetat etat;
   //  private boolean encherePrivee;
     private     String codeAcces;
+    private     String username;
+
 
 
 

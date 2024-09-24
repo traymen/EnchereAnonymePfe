@@ -63,6 +63,10 @@ public class EnchereController {
     void ajooutEcnhereTerminer(@RequestBody  Enchere enchere , @RequestParam Integer idEnch){
         service.ajoutEnchereTerminer(enchere, idEnch);
     }
+    @PostMapping("/AjoutEnchereTerminerAuto")
+    void ajooutEcnhereTerminerr( @RequestParam Integer idEnchere){
+        service.ajoutEnchereTerminerr( idEnchere);
+    }
     @GetMapping("/AfficherListEnchereByType")
     @ResponseBody
     public ResponseEntity<List<EnchereResponse>> getListEnchereType(TypeEnchere type) {

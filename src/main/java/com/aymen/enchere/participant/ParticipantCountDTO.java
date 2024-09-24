@@ -4,13 +4,18 @@ public class ParticipantCountDTO {
     private String firstname;
     private String lastname;
     private String gmail;
+    private String username;
+
+
     private long participationCount;
 
     // Constructeurs, getters et setters
-    public ParticipantCountDTO(String firstname, String lastname, String gmail, long participationCount) {
+    public ParticipantCountDTO(String firstname, String lastname, String gmail,String username ,long participationCount) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.gmail = gmail;
+        this.username = username;
+
         this.participationCount = participationCount;
     }
 

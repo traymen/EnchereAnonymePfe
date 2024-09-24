@@ -23,7 +23,16 @@ public class Participant extends BaseEntity {
     String firstname;
     String lastname;
     String gmail;
+    String username ;
     @JsonIgnore
     @ManyToOne
     Enchere enchere;
+    public String getUserName() {
+        return lastname;
+    }
+
+    // Setter pour le nom d'utilisateur (si nécessaire)
+    public void setUserName(String lastname) {
+        this.lastname = lastname;
+    }
 }

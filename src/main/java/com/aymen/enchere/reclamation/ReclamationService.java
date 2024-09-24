@@ -17,12 +17,7 @@ public class ReclamationService {
 
     @Autowired
     private ReclamationRepository reclamationRepository;
-/*
-    public Reclamation createReclamation(Reclamation reclamation) {
-        reclamation.setReponse("en cours de traitement");
-        return reclamationRepository.save(reclamation);
-    }
-*/
+
 public Reclamation createReclamation(Reclamation reclamation) {
     if (reclamation.getReponse() == null || reclamation.getReponse().isEmpty()) {
         reclamation.setEtat(EtatReclamation.EN_COURS);  // Définit l'état à "En cours de traitement" si la réponse est nulle ou vide
@@ -84,16 +79,7 @@ public Reclamation createReclamation(Reclamation reclamation) {
 
         return response;
     }
-/*
-    public void repondrereclamation(Reclamation reclamation , Integer idReclamation) {
-        Reclamation reclamation1= reclamationRepository.findById(idReclamation).get();
-        reclamation1.setReponse(reclamation.getReponse());
 
-        reclamationRepository.save(reclamation1);
-
-    }
-
- */
 public void repondrereclamation(Reclamation reclamation, Integer idReclamation) {
     // Récupérer la réclamation existante par son ID
     Reclamation reclamation1 = reclamationRepository.findById(idReclamation).orElseThrow(() -> new RuntimeException("Réclamation non trouvée"));

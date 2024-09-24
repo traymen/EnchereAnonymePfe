@@ -3,6 +3,7 @@ package com.aymen.enchere.enchere;
 import com.aymen.enchere.file.FileStorageService;
 import com.aymen.enchere.file.FileUtils;
 import com.aymen.enchere.notification.ServiceNotification;
+import com.aymen.enchere.participant.Participant;
 import com.aymen.enchere.user.User;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,23 +29,7 @@ public class EnchereService  {
     private final EnchereRepository enchereRepository;
     private final FileStorageService fileStorageService;
     private final ServiceNotification notificationService;
-    /*
-public Integer save(Enchere request, Authentication connectedUser) {
-    request.setNombreCondidatsRestants(request.getNombreCondidat());
-    request.setNombreCondidatsInscrits(0);
-        request.setEtat(Typeetat.Encours);
-    String description = "Une nouvelle enchère '" + request.getNomProduit() ;
-    String imageUrl =request.getImage();
-    notificationService.createNotification(
-            "Nouvelle enchère ajoutée",
-            description,
-            imageUrl
 
-    );
-
-    return enchereRepository.save(request).getIdEnchere();
-}
-*/
     public Integer save(Enchere request, Authentication connectedUser) {
         request.setNombreCondidatsRestants(request.getNombreCondidat());
         request.setNombreCondidatsInscrits(0);
@@ -109,6 +95,8 @@ public Integer save(Enchere request, Authentication connectedUser) {
         response.setNombreCondidatsRestants(enchere.getNombreCondidatsRestants());
         response.setType(enchere.getType());
         response.setEtat(enchere.getEtat());
+        response.setUsername(enchere.getUsername());
+
         response.setCodeAcces(enchere.getCodeAcces());
 
 
@@ -170,6 +158,30 @@ public Integer save(Enchere request, Authentication connectedUser) {
         enchereRepository.save(enchere1);
 
     }
+    public void ajoutEnchereTerminerr(Integer idEnchere) {
+        // Récupérer l'enchère par son ID
+        Enchere enchere = enchereRepository.findById(idEnchere).orElseThrow(() -> new RuntimeException("Enchère non trouvée"));
+
+        // Récupérer la liste des participants de cette enchère
+        List<Participant> participants=enchere.getParticipantList();
+        if (participants.isEmpty()) {
+            throw new RuntimeException("Aucun participant pour cette enchère");
+        }
+
+        // Trouver le participant avec le prix le plus élevé
+        Participant gagnant = participants.stream()
+                .max(Comparator.comparing(Participant::getPrix))
+                .orElseThrow(() -> new RuntimeException("Erreur lors du calcul du prix gagnant"));
+        String nomGagnant = gagnant.getUserName();
+        // Mettre à jour l'enchère avec le prix gagnant et changer l'état
+        enchere.setPrixGagnant(gagnant.getPrix());
+        enchere.setUsername(nomGagnant);
+        enchere.setEtat(Typeetat.Terminer);
+
+        // Sauvegarder les modifications dans la base de données
+        enchereRepository.save(enchere);
+    }
+
 
     public List<EnchereResponse> getListEnchereByid(Integer EcnhereID) {
         Optional<Enchere> encheres = enchereRepository.findById(EcnhereID);

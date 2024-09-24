@@ -30,6 +30,7 @@ public class Enchere extends BaseEntity {
     String descriptionProduit ;
     Integer nombreCondidat ;
     LocalDate date ;
+ String username ;
     LocalTime heure ;
     String image ;
     Float Prix ;
